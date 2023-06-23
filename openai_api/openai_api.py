@@ -13,8 +13,8 @@ RAW_DATA_FILE = 'mqtt_message.txt' # file that provides raw data
 # openAI api request
 def httpRequest(prompt):
     
-    # api_key = "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"
     api_key = os.getenv("OPENAI_API_KEY")
+
     url = 'https://api.openai.com/v1/chat/completions'
     
 
@@ -23,7 +23,7 @@ def httpRequest(prompt):
         "Content-Type": "application/json"
     }
     response = requests.post(url, headers=headers, json=prompt).json()
-    # print("RESPONSE!: ",response)
+
     try:
         print("\nResponse:")
         generated_text = response["choices"][0]["message"]["content"]
@@ -62,7 +62,7 @@ def main():
     
 
     # do num_of_times times
-    num_of_times = 100
+    num_of_times = 10
     for i in range(num_of_times):
 
         # Load raw data file

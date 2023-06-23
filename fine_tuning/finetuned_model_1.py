@@ -9,6 +9,8 @@ Variables that requires user inputs will be marked with TODO
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-01-09-57-07"
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-24-08"
 FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-58-58"
+TEST_DATA_FILE = "raw_data.txt"
+
 # openAI api request
 def httpRequest(prompt):
     
@@ -45,11 +47,11 @@ def httpRequest(prompt):
 def main():
 
     # number of times to call api
-    num_times = 100
+    num_times = 3
     start_time = time.time()
     for i in range(num_times):
         # Load mqtt file
-        filename3 = 'raw_data.txt'
+        filename3 = TEST_DATA_FILE
         prompt = "Data:\n"
         with open(filename3, 'r') as f:
             prompt += f.read()
