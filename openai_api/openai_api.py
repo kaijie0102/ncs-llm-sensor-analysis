@@ -13,6 +13,7 @@ RAW_DATA_FILE = 'mqtt_message.txt' # file that provides raw data
 # openAI api request
 def httpRequest(prompt):
     
+
     api_key = os.getenv("OPENAI_API_KEY")
 
     url = 'https://api.openai.com/v1/chat/completions'
