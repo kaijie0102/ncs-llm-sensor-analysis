@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import sys
 import time
 
-BROKER_IP = "192.168.217.135"
+BROKER_IP = "192.168.194.135"
 
 def on_log(client,userdata,level,buf):
     print("log: "+buf)
