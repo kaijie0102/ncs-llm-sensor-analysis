@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 
-BROKER_IP = "192.168.194.135"
+BROKER_IP = "192.168.237.135"
 OUTPUT_FILE = "../fine_tuning/raw_data.txt"
 
 # callback to output log
@@ -17,8 +17,8 @@ def on_connect(client,userdata,flags,rc):
 # callback to output message received by client
 def on_message(client, userdata, message):
     # print("im in here")
-    # print("Received message on /topic {}: {}".format(message.topic, message.payload))
     file = open(OUTPUT_FILE,"a")
+    print("Received message on /topic {}: {}".format(message.topic, message.payload))
     print("payload: ",message.payload)
     file.write(message.payload.decode('utf-8'))
     # file.write("\n")
@@ -30,7 +30,7 @@ client = mqtt.Client("sub")
 client.username_pw_set("pi","123456")
 
 # Subscribe to topic
-topic = "test/status"
+# topic = "test/status"
 
 # Set callback functions
 client.on_message = on_message
@@ -42,7 +42,8 @@ print("Connecting to broker ", broker)
 file = open(OUTPUT_FILE,"w")
 client.connect(broker)
 # client.loop_start()
-client.subscribe("test/status")
+client.subscribe("light")
+client.subscribe("vibration")
 client.loop_forever()
 # client.subscribe("non-ex")
 # client.loop_stop()

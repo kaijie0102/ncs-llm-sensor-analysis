@@ -11,8 +11,10 @@ Variables that requires user inputs will be marked with TODO
 """
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-01-09-57-07"
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-24-08"
-FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-58-58" # vibration 30 1 tap, 30 2taps, 30 3 taps
-TEST_DATA_FILE = "raw_data.txt"
+# FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-58-58" # vibration 30 1 tap, 30 2taps, 30 3 taps
+FINETUNED_MODEL = "ada:ft-personal-2023-07-05-11-03-17" #fill in with latest model"
+# ada:ft-personal-2023-07-10-12-55-09 # 252 training 
+TEST_DATA_FILE = "light_raw_data.txt"
 
 # openAI api request
 def httpRequest(prompt):
@@ -26,9 +28,9 @@ def httpRequest(prompt):
     response = requests.post(url, headers=headers, json=prompt).json()
     try:
         # cases
-        ONE_TAP  = "one tap"
-        TWO_TAPS = "two taps"
-        THREE_TAPS = "three taps"
+        ONE_TAP  = "SingleTap"
+        TWO_TAPS = "DoubleTap"
+        HOLD = "Hold"
 
         print("\nResponse:")
         generated_text = response["choices"][0]["text"]
@@ -38,8 +40,8 @@ def httpRequest(prompt):
             return 1
         elif TWO_TAPS in generated_text:
             return 2
-        elif THREE_TAPS in generated_text:
-            return 3
+        elif HOLD in generated_text:
+            return "No"
         else:
             return "Unknown"
         # return generated_text
@@ -52,26 +54,25 @@ def in_range(val,lower, upper):
     return True
 
 def extract_lines(filename):
-    THRESHOLD = 0.07
+    THRESHOLD = 10
+    BASELINE_BUFFER = 10
     
     with open(filename, 'r') as file:
         lines = file.readlines()
         
         # pre processing
         for index in range(len(lines)):
-            # print("current: ", lines[index])
             if (len(lines[index])>20):
-                # print("overlength, trim! ", lines[index])
                 lines[index] = lines[index][15:]
-                # print("aftertrim: ", lines[index])
-            lines[index] = lines[index].split() # to make line an row of 3 elements
 
-        # print(lines)
+            lines[index] = lines[index].split(",") # to make line an row of 4 elements
+
 
         # setting lower and upper bound
-        lines[0][2].strip()
-        upper_bound = float(lines[0][2]) + THRESHOLD
-        lower_bound = float(lines[0][2]) - THRESHOLD
+        lines[0][3].strip()
+        print("first lines: ", lines[0])
+        upper_bound = float(lines[0][3]) + THRESHOLD
+        lower_bound = float(lines[0][3]) - THRESHOLD
         tap_started = False
         end_count=0
         start_index=-1
@@ -81,7 +82,7 @@ def extract_lines(filename):
         
             # find start index
             # print("current before: ", float(lines[i][2]))
-            current = float(lines[i][2].strip())
+            current = float(lines[i][3].strip())
             if not in_range(current,lower_bound,upper_bound) and not tap_started:
                 start_index = i
                 tap_started = True
@@ -92,17 +93,16 @@ def extract_lines(filename):
                 else: 
                     end_count=0
 
-                if end_count>20:
+                if end_count>10:
                     # tap has ended
-                    end_index = i - 20
+                    end_index = i - 10
                     break
 
-    # start_index=5
-    # end_index=82
+    print(f"Start: {start_index}, End: {end_index}")
     if start_index==-1 or end_index==-1:
         return -1
     else:
-        test_data = lines[start_index-5:end_index+5]
+        test_data = lines[start_index-BASELINE_BUFFER:end_index+BASELINE_BUFFER]
         # print("got new line: ", test_data)
         return test_data
 
@@ -171,11 +171,11 @@ def main():
                 for element in row:
                     prompt+=element
                     prompt+=" "
-                prompt+="\n"
+                # prompt+="\n"
             prompt+="\n\nAnswer:"
 
             
-            # print("Sending Prompt: \n"+prompt)
+            print("Sending Prompt: \n"+prompt)
 
             # edit here
             prompt = {
