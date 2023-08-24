@@ -7,8 +7,8 @@ import time
 import tiktoken
 
 # VARIABLES that can be adjusted
-TRAINING_FILE = 'before_finetune.txt' # file that provides training data
-RAW_DATA_FILE = 'mqtt_message.txt' # file that provides raw data
+TRAINING_FILE = 'data/before_finetune.txt' # file that provides training data
+RAW_DATA_FILE = 'data/mqtt_message.txt' # file that provides raw data
 
 # openAI api request
 def httpRequest(prompt):
