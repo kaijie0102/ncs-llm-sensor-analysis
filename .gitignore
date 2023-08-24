@@ -8,4 +8,5 @@ fine_tuning/data
 *.env
 openai_api/archive_light
 openai_api/mosquitto.log
+openai_api/data
 lib
