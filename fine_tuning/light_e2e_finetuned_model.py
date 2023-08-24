@@ -12,9 +12,9 @@ Variables that requires user inputs will be marked with TODO
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-01-09-57-07"
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-24-08"
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-58-58" # vibration 30 1 tap, 30 2taps, 30 3 taps
-FINETUNED_MODEL = "ada:ft-personal-2023-07-05-11-03-17" #fill in with latest model"
-# ada:ft-personal-2023-07-10-12-55-09 # 252 training 
-TEST_DATA_FILE = "light_raw_data.txt"
+# FINETUNED_MODEL = "ada:ft-personal-2023-07-05-11-03-17" # 252 training
+FINETUNED_MODEL = "ada:ft-personal-2023-07-10-12-55-09" # 252 training 
+TEST_DATA_FILE = "data/light_raw_data.txt"
 
 # openAI api request
 def httpRequest(prompt):
@@ -41,7 +41,7 @@ def httpRequest(prompt):
         elif TWO_TAPS in generated_text:
             return 2
         elif HOLD in generated_text:
-            return "No"
+            return HOLD
         else:
             return "Unknown"
         # return generated_text
@@ -54,7 +54,7 @@ def in_range(val,lower, upper):
     return True
 
 def extract_lines(filename):
-    THRESHOLD = 10
+    THRESHOLD = 5
     BASELINE_BUFFER = 10
     
     with open(filename, 'r') as file:
@@ -70,7 +70,7 @@ def extract_lines(filename):
 
         # setting lower and upper bound
         lines[0][3].strip()
-        print("first lines: ", lines[0])
+        # print("first lines: ", lines[0])
         upper_bound = float(lines[0][3]) + THRESHOLD
         lower_bound = float(lines[0][3]) - THRESHOLD
         tap_started = False
@@ -98,7 +98,7 @@ def extract_lines(filename):
                     end_index = i - 10
                     break
 
-    print(f"Start: {start_index}, End: {end_index}")
+    # print(f"Start: {start_index}, End: {end_index}")
     if start_index==-1 or end_index==-1:
         return -1
     else:
@@ -153,7 +153,7 @@ def main():
         # extract relevant rows of data for testing
         test_data = extract_lines(TEST_DATA_FILE)
         if test_data==-1:
-            print("No Taps Detected")
+            print("No Gesture Detected")
             break
         
         # print("test_data: ", test_data)
@@ -164,18 +164,19 @@ def main():
         for i in range(num_times):
             # Load mqtt file
             # filename3 = TEST_DATA_FILE
-            prompt = "Data:\n"
+            prompt = "Data:\n\n"
             # with open(filename3, 'r') as f:
                 # prompt += f.read()
             for row in test_data:
                 for element in row:
                     prompt+=element
-                    prompt+=" "
+                    if row[-1] != element:
+                        prompt+=","
                 # prompt+="\n"
             prompt+="\n\nAnswer:"
 
             
-            print("Sending Prompt: \n"+prompt)
+            # print("Sending Prompt: \n"+prompt)
 
             # edit here
             prompt = {
@@ -190,6 +191,8 @@ def main():
 
             if apiResponse==None:
                 print("Context too long")
+            elif apiResponse=="Hold":
+                print("Hold detected.") 
             else:   
                 print("{} tap(s) detected".format(apiResponse))
 

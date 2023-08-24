@@ -12,9 +12,11 @@ Variables that requires user inputs will be marked with TODO
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-58-58" # latest
 
 # pramukas model
-# FINETUNED_MODEL = "ada:ft-personal-2023-07-05-11-03-17"
-FINETUNED_MODEL = "ada:ft-personal-2023-07-10-12-55-09"
-TEST_DATA_FILE = "test_data.txt"
+# FINETUNED_MODEL = "ada:ft-personal-2023-07-05-11-03-17" # train 300
+# FINETUNED_MODEL = "ada:ft-personal-2023-07-10-12-55-09" # train 252
+FINETUNED_MODEL = "ada:ft-personal-2023-07-10-20-32-27" # train 504
+
+TEST_DATA_FILE = "data/test_data.txt"
 ANSWER = 1
 # number of times to call api
 NUM_TIMES = 1
@@ -44,8 +46,9 @@ def httpRequest(prompt):
         elif TWO_TAPS in generated_text:
             return 2
         elif HOLD in generated_text:
-            return "No"
+            return "Hold"
         else:
+            print(f"UNKNOWN: {generated_text}")
             return "Unknown"
         # return generated_text
     except:
@@ -55,7 +58,15 @@ def httpRequest(prompt):
 def main():
 
     gesture_count=1
+    # Load file
+    filename3 = TEST_DATA_FILE
+
+    # clear file
+    with open(filename3, 'w') as f:
+        f.write("")
+    f.close()
     while True:
+
         # wait for file to be updated
         initial_modification_time = os.path.getmtime(TEST_DATA_FILE)
         while True:
@@ -63,6 +74,13 @@ def main():
             current_modification_time = os.path.getmtime(TEST_DATA_FILE)
             # Compare the modification times
             if current_modification_time > initial_modification_time:
+                # prompt_data = "Data:\n"
+                # prompt_data=""
+                with open(filename3, 'r') as f:
+                    prompt_data = f.read()
+                # prompt_data+="\n\nAnswer:"
+                # f.close()
+                print("prompt_data: ", prompt_data)
                 break
 
 
@@ -70,13 +88,7 @@ def main():
         correct_ans = 0
 
 
-        # Load mqtt file
-        filename3 = TEST_DATA_FILE
-        prompt_data = "Data:\n"
-        with open(filename3, 'r') as f:
-            prompt_data += f.read()
-        prompt_data+="\n\nAnswer:"
-        f.close()
+        
             
         for i in range(NUM_TIMES):
 
@@ -94,7 +106,11 @@ def main():
             if apiResponse == ANSWER:
                 correct_ans += 1
 
-            print(f"Gesture {gesture_count}: {apiResponse} tap(s) detected \n")
+            if apiResponse=="Hold":
+                print(f"Gesture {gesture_count}: Hold detected \n")
+            else:
+                print(f"Gesture {gesture_count}: {apiResponse} tap(s) detected \n")
+
         end_time = time.time()
         gesture_count+=1
         # print(end_time-start_time,"s has elapsed")

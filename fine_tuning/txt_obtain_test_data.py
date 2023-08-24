@@ -4,7 +4,7 @@ def in_range(val,lower, upper):
     return True
 
 def extract_lines(filename):
-    TEST_DATA_FILE_PATH = "raw_data.txt"
+    TEST_DATA_FILE_PATH = "data/raw_data.txt"
     THRESHOLD = 0.05
     
     with open(filename, 'r') as file:

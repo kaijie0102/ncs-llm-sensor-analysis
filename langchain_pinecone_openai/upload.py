@@ -22,7 +22,7 @@ PINECONE_ENV=os.environ["PINECONE_ENV"]
 PINECONE_API_KEY=os.environ["PINECONE_API_KEY"]
 
 # load pdf file and split it into chunks
-loader = UnstructuredFileLoader("vibration_prompt_steven_pdf.pdf")
+loader = UnstructuredFileLoader("data/vibration_prompt_steven_pdf.pdf")
 data = loader.load()
 # print("data: ",data)
 

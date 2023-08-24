@@ -64,7 +64,7 @@ llm = OpenAI(temperature=0, openai_api_key=OPENAI_API_KEY)
 # chain = load_qa_chain(llm, chain_type="stuff")
 
 # Load query
-filename3 = 'mqtt_message.txt'
+filename3 = 'data/mqtt_message.txt'
 with open(filename3, 'r') as f:
     query = f.read()
 

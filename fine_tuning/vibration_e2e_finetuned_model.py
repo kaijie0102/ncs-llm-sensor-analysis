@@ -12,7 +12,7 @@ Variables that requires user inputs will be marked with TODO
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-01-09-57-07"
 # FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-24-08"
 FINETUNED_MODEL = "ada:ft-personal-2023-06-05-08-58-58" # vibration 30 1 tap, 30 2taps, 30 3 taps
-TEST_DATA_FILE = "vibration_raw_data.txt"
+TEST_DATA_FILE = "data/vibration_raw_data.txt"
 
 # openAI api request
 def httpRequest(prompt):
@@ -105,6 +105,7 @@ def extract_lines(filename):
         test_data = lines[start_index-5:end_index+5]
         # print("got new line: ", test_data)
         return test_data
+    
 
 
 def main():
