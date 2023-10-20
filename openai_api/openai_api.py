@@ -7,8 +7,8 @@ import time
 import tiktoken
 
 # VARIABLES that can be adjusted
-TRAINING_FILE = 'data/before_finetune.txt' # file that provides training data
-RAW_DATA_FILE = 'data/mqtt_message.txt' # file that provides raw data
+CONTEXT_FILE = 'data/before_finetune.txt' # file that provides training data
+RAW_DATA_FILE = 'data/robot_raw_data.txt' # file that provides raw data
 
 # openAI api request
 def httpRequest(prompt):
@@ -40,10 +40,10 @@ def main():
     messages = [{"role":"system","content":"I want you to act as an data scientist. Given a data set, analyse the pattern to give the correct number of taps. Several Data and Answers will be given as example"}]
     # Load prompt file
     
-    with open(TRAINING_FILE, 'r') as f:
-        prompt1 = f.read()
-        # print("length of prompt!", len(prompt1))  # length is like 9thousand
-        messages.append({"role": "user", "content": "{}".format(prompt1)})
+    with open(CONTEXT_FILE, 'r') as f:
+        context = f.read()
+        # print("length of prompt!", len(context))  # length is like 9thousand
+        messages.append({"role": "user", "content": "{}".format(context)})
 
     
     # while True:
@@ -63,28 +63,28 @@ def main():
     
 
     # do num_of_times times
-    num_of_times = 10
+    num_of_times = 5
     for i in range(num_of_times):
 
         # Load raw data file
         filename3 = RAW_DATA_FILE        
-        prompt3 = "Data:\n"
+        prompt_msg = "Data:\n"
 
         with open(filename3, 'r') as f:
-            prompt3 += f.read()
+            prompt_msg += f.read()
 
-        prompt3 +="\n\nAnswer:"
+        prompt_msg +="\n\nAnswer:"
 
         # # splitting up long prompt into multiple prompts
         # chunk_size = 512
-        # chunks = re.findall('.{1,' + str(chunk_size) + '}(?:\\s+|$)', prompt1)
+        # chunks = re.findall('.{1,' + str(chunk_size) + '}(?:\\s+|$)', context)
         
         # for chunk in chunks:
         #     # print(chunk)
         #     pass
         #     #messages.append({"role": "system", "content": "{}".format(chunk)})
         
-        messages.append({"role": "user", "content": "{}".format(prompt3)})
+        messages.append({"role": "user", "content": "{}".format(prompt_msg)})
         
         # print("here is messages: ",messages)
 
@@ -96,12 +96,13 @@ def main():
         # edit here
         prompt = {
             # "messages": [
-            #     {"role": "user", "content": "{}".format(prompt3)}  # ,
+            #     {"role": "user", "content": "{}".format(prompt_msg)}  # ,
             #     # {"role": "user","content":"{}".format(prompt2)}
 
             # ],
             "messages":messages,
-            "model": "gpt-3.5-turbo-16k",
+            # "model": "gpt-3.5-turbo-16k",
+            "model": "gpt-4",
             "temperature":0.3
         }
 
@@ -117,7 +118,7 @@ def main():
         #     # presence_penalty=0
         # )
 
-        # print("Prompt \"{}\" has been sent. Waiting for response...".format(prompt3))
+        # print("Prompt \"{}\" has been sent. Waiting for response...".format(prompt_msg))
         print("Prompt {} has been sent. Waiting for response...".format(i+1))
         apiResponse = httpRequest(prompt)
         messages.pop()
