@@ -2,16 +2,20 @@ import paho.mqtt.client as mqtt
 import os
 
 # ensure that ip address is updated in env file
-BROKER_IP = os.getenv("PI_IP_ADDRESS")
-print("broker: ",BROKER_IP)
 # BROKER_IP = os.getenv("PI_IP_ADDRESS")
+BROKER_IP = "192.168.55.135"
+
 VIBRATION_OUTPUT_FILE = "../fine_tuning/data/vibration_raw_data.txt"
 LIGHT_OUTPUT_FILE = "../fine_tuning/data/light_raw_data.txt"
-ROBOT_OUTPUT_FILE = "../robot/data/robot_raw_data.txt"
+ROBOT_OUTPUT_FILE = "../openai_api/data/robot_raw_data.txt"
+RSSI_OUTPUT_FILE = "../openai_api/data/rssi_raw_data.txt"
+ENV_OUTPUT_FILE = "../openai_api/data/env_raw_data.txt"
 
 LIGHT_TOPIC = "light"
 VIBRAITON_TOPIC = "vibration"
 ROBOT_TOPIC = "robot"
+ENV_TOPIC = "env"
+RSSI_TOPIC = "rssi"
 
 # callback to output log
 def on_log(client,userdata,level,buf):
@@ -26,8 +30,7 @@ def on_connect(client,userdata,flags,rc):
 
 # callback to output message received by client
 def on_message(client, userdata, message):
-    # print("im in here")
-    # light 
+   
     print("payload: ",message.payload)
 
     """
@@ -40,11 +43,14 @@ def on_message(client, userdata, message):
         vibration_file.write(message.payload.decode('utf-8'))
     """
 
-    robot_file = open(ROBOT_OUTPUT_FILE,"a")
-    if message.topic==ROBOT_TOPIC:
-        robot_file.write(message.payload.decode('utf-8'))
-
-    file.close()
+    print(message.topic)
+    if message.topic==RSSI_TOPIC:
+        rssi_file = open(RSSI_OUTPUT_FILE,"w")
+        rssi_file.write(message.payload.decode('utf-8'))
+    
+    if message.topic==ENV_TOPIC:
+        env_file = open(ENV_OUTPUT_FILE,"w")
+        env_file.write(message.payload.decode('utf-8'))
 
 # configuring connection
 broker = BROKER_IP
@@ -63,15 +69,14 @@ client.on_log=on_log
 print("Connecting to broker ", broker)
 # file = open(LIGHT_OUTPUT_FILE,"w")
 # file = open(VIBRATION_OUTPUT_FILE,"w")
-file = open(ROBOT_OUTPUT_FILE,"w")
+# file = open(RSSI_OUTPUT_FILE,"w")
 
 client.connect(broker)
 # client.loop_start()
 
 # client.subscribe(LIGHT_TOPIC)
 # client.subscribe(VIBRAITON_TOPIC)
-client.subscribe(ROBOT_TOPIC)
+client.subscribe([(RSSI_TOPIC, 0), (ENV_TOPIC, 0)])
 
 client.loop_forever()
-# client.subscribe("non-ex")
 # client.loop_stop()

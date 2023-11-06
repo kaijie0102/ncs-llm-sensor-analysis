@@ -1,9 +1,9 @@
 import paho.mqtt.client as mqtt
 import sys
 import time
+import os
 
-BROKER_IP = "192.168.14.135"
-
+BROKER_IP = os.getenv("PI_IP_ADDRESS")
 def on_log(client,userdata,level,buf):
     print("log: "+buf)
 
@@ -26,9 +26,8 @@ print("Connecting to broker ", broker)
 client.connect(broker)
 for i in range(1):
     message = str(time.time())+"rivals of mqtt???\n"
-    client.publish("vibration","{}".format(message))
+    client.publish("env","{}".format(message))
     client.loop_start()
     # time.sleep(1)
     client.loop_stop()
 # client.disconnect
-
